@@ -7,7 +7,9 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
+import java.util.List;
 
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -32,6 +34,7 @@ public class CadastraCosmetico extends JFrame {
 	private JTextField txtTipo;
 	private JTextField txtValor;
 	private JButton btCadastrar;
+	private JList list;
 
 	/**
 	 * Launch the application.
@@ -51,8 +54,10 @@ public class CadastraCosmetico extends JFrame {
 
 	/**
 	 * Create the frame.
+	 * @throws SQLException 
+	 * @throws ClassNotFoundException 
 	 */
-	public CadastraCosmetico() {
+	public CadastraCosmetico() throws ClassNotFoundException, SQLException {
 		setTitle("Cadastrar Cosmético");
 		setIconImage(
 				Toolkit.getDefaultToolkit().getImage(CadastraCosmetico.class.getResource("/imagens/cosmeticos.jpg")));
@@ -136,23 +141,76 @@ public class CadastraCosmetico extends JFrame {
 		scrollPane.setBounds(56, 55, 309, 197);
 		panel_1.add(scrollPane);
 
-		JList list = new JList();
+		list = new JList();
 		list.setBorder(new TitledBorder(
 				new EtchedBorder(EtchedBorder.LOWERED, new Color(255, 255, 255), new Color(160, 160, 160)),
 				"Cosm\u00E9ticos Cadastrados", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 		scrollPane.setViewportView(list);
 
 		JButton btnNewButton_1 = new JButton("Exibir");
+		btnNewButton_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Cosmetico c = (Cosmetico) list.getSelectedValue();
+				String s = "Nome: "+c.getNome()+"\nTipo: "+ c.getTipo()+"\nValor: "+c.getValor();
+				JOptionPane.showMessageDialog(null, s);
+			}
+		});
 		btnNewButton_1.setBounds(31, 287, 85, 21);
 		panel_1.add(btnNewButton_1);
 
 		JButton btnNewButton_1_1 = new JButton("Editar");
+		btnNewButton_1_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				editar();
+				
+			}
+		});
 		btnNewButton_1_1.setBounds(175, 287, 85, 21);
 		panel_1.add(btnNewButton_1_1);
 
 		JButton btnNewButton_1_1_1 = new JButton("Remover");
-		btnNewButton_1_1_1.setBounds(319, 287, 85, 21);
+		btnNewButton_1_1_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					removerCosmetico();
+				} catch (ClassNotFoundException | SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
+		btnNewButton_1_1_1.setBounds(295, 287, 109, 21);
 		panel_1.add(btnNewButton_1_1_1);
+		
+		atualizarLista();
+	}
+
+	protected void editar() {
+		if(list.getSelectedIndex() == -1) {
+			exibirMensagemErro("Selecione um cosmético.");
+		}
+		Cosmetico c = (Cosmetico) list.getSelectedValue();
+		
+		txtNome.setText(c.getNome());
+		txtValor.setText(String.valueOf(c.getValor()));
+		txtTipo.setText(c.getTipo());
+		btCadastrar.setText("Editar");
+		
+	}
+
+	protected void removerCosmetico() throws ClassNotFoundException, SQLException {
+		if(list.getSelectedIndex() == -1) {
+			exibirMensagemErro("Selecione o cosmético");
+			return;
+		}
+		
+		CosmeticoDao dao = new CosmeticoDao();
+		Cosmetico c = (Cosmetico) list.getSelectedValue();
+		
+		dao.deleteCosmetico(c);
+		atualizarLista();
+		
 	}
 
 	protected void cadastrarCosmeticos() throws NumberFormatException, ClassNotFoundException, SQLException {
@@ -181,8 +239,12 @@ public class CadastraCosmetico extends JFrame {
 			}
 		}else if(btCadastrar.getText().equals("Editar")) {
 			CosmeticoDao dao = new CosmeticoDao();
+			Cosmetico c = (Cosmetico) list.getSelectedValue();
+			c.setNome(txtNome.getText());
+			c.setTipo(txtTipo.getText());
+			c.setValor(Double.parseDouble(txtValor.getText()));
 			try {
-				dao.updateCosmetico(txtNome.getText(), txtTipo.getText(), Double.parseDouble(txtValor.getText()));
+				dao.updateCosmetico(c);
 			}catch(Exception e) {
 				JOptionPane.showMessageDialog(null, "Erro ao tentar editar cosmético, tente novamente.");
 			}
@@ -198,8 +260,18 @@ public class CadastraCosmetico extends JFrame {
 		txtValor.setText("");
 	}
 
-	private void atualizarLista() {
-	
+	private void atualizarLista() throws ClassNotFoundException, SQLException {
+		CosmeticoDao dao = new CosmeticoDao();
+		List<Cosmetico> l = dao.buscarCosmeticos();
+		
+		DefaultListModel<Cosmetico> modelo = new DefaultListModel<>();
+		
+		for(int i = 0; i < l.size(); i++) {
+			Cosmetico c = l.get(i);
+			modelo.addElement(c);
+		}
+		
+		list.setModel(modelo);
 		
 	}
 

@@ -2,6 +2,10 @@ package dominio;
 
 public class Cosmetico {
 	private int id;
+	@Override
+	public String toString() {
+		return "Nome: "+nome +" Tipo:"+tipo;
+	}
 	private double valor;
 	private String nome;
 	private String tipo;
