@@ -123,4 +123,46 @@ public class CosmeticoDao {
 
 		return cosmeticosCadastrados;
 	}
+	
+	public List<Cosmetico> buscaCosmeticoPeloNome(String nome) throws ClassNotFoundException, SQLException{
+		Connection conexao = FabricaConexao.criarConexao();
+		System.out.println("Buscando");
+		String sql = " SELECT * FROM cosmetico WHERE 1 = 1 ";
+
+		if (nome != null && !nome.isEmpty()) {
+			sql += " AND upper(nome) LIKE ? ";
+
+		}
+
+		PreparedStatement comando = conexao.prepareStatement(sql.toString());
+
+		int i = 1;
+
+		if (nome != null && !nome.isEmpty()) {
+			comando.setString(i++, "%" + nome.toUpperCase() + "%");
+
+		}
+		
+		
+		ResultSet resultado = comando.executeQuery();
+
+		List<Cosmetico> ce = new ArrayList<>();
+
+		while (resultado.next()) {
+			Cosmetico m = new Cosmetico();
+			m.setId(resultado.getInt("id"));
+			m.setNome(resultado.getString("nome"));
+			m.setIdmarca(resultado.getInt("idmarca"));
+			m.setTipo(resultado.getString("tipo"));
+			m.setValor(resultado.getDouble("valor"));
+
+			ce.add(m);
+		}
+		
+		System.out.println("Achou");
+		return ce;
+		
+	}
 }
+
+

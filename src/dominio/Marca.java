@@ -1,9 +1,13 @@
 package dominio;
 
 public class Marca {
+	@Override
+	public String toString() {
+		return nome +" Seguemento:"+seguemento;
+	}
 	private int id;
 	private String nome;
-	private String segmento;
+	private String seguemento;
 	
 	
 	public int getId() {
@@ -19,10 +23,10 @@ public class Marca {
 		this.nome = nome;
 	}
 	public String getSegmento() {
-		return segmento;
+		return seguemento;
 	}
 	public void setSegmento(String segmento) {
-		this.segmento = segmento;
+		this.seguemento = segmento;
 	}
 	
 }
