@@ -10,6 +10,7 @@ import java.util.List;
 import javax.swing.JOptionPane;
 
 import dominio.Cosmetico;
+
 import dominio.Marca;
 
 public class CosmeticoDao {
@@ -66,7 +67,6 @@ public class CosmeticoDao {
 	}
 
 	public void updateCosmetico(Cosmetico c) throws ClassNotFoundException, SQLException {
-		
 
 		Connection conexao = FabricaConexao.criarConexao();
 
@@ -91,10 +91,10 @@ public class CosmeticoDao {
 		String sql = "DELETE FROM cosmetico WHERE ID = ?";
 
 		PreparedStatement comando = conexao.prepareStatement(sql);
-		
+
 		comando.setInt(1, c.getId());
 		comando.executeUpdate();
-		
+
 		comando.close();
 		conexao.close();
 	}
@@ -123,8 +123,8 @@ public class CosmeticoDao {
 
 		return cosmeticosCadastrados;
 	}
-	
-	public List<Cosmetico> buscaCosmeticoPeloNome(String nome) throws ClassNotFoundException, SQLException{
+
+	public List<Cosmetico> buscaCosmeticoPeloNome(String nome) throws ClassNotFoundException, SQLException {
 		Connection conexao = FabricaConexao.criarConexao();
 		System.out.println("Buscando");
 		String sql = " SELECT * FROM cosmetico WHERE 1 = 1 ";
@@ -142,8 +142,7 @@ public class CosmeticoDao {
 			comando.setString(i++, "%" + nome.toUpperCase() + "%");
 
 		}
-		
-		
+
 		ResultSet resultado = comando.executeQuery();
 
 		List<Cosmetico> ce = new ArrayList<>();
@@ -158,11 +157,65 @@ public class CosmeticoDao {
 
 			ce.add(m);
 		}
-		
+
 		System.out.println("Achou");
 		return ce;
+
+	}
+
+	public List<Cosmetico> buscarCosmetico(String s, String s1) throws ClassNotFoundException, SQLException {
+		Connection conexao = FabricaConexao.criarConexao();
+		String sql = "SELECT c.nome, c.tipo, c.valor,  m.nome AS nomemarca  FROM cosmetico c JOIN marca m ON c.idmarca= m.idmarca";
+
+		boolean temFiltro = false;
+
+		if (s != null && !s.isEmpty()) {
+			sql += " WHERE c.nome LIKE ?";
+			temFiltro = true;
+		}
+
+		if (s1 != null && !s1.isEmpty()) {
+			sql += temFiltro ? " AND c.tipo LIKE ?" : " WHERE c.tipo LIKE ?";
+			temFiltro = true;
+		}
+
 		
+
+		
+		PreparedStatement comando = conexao.prepareStatement(sql.toString());
+		int i = 1;
+
+		if (s != null && !s.isEmpty()) {
+			comando.setString(i, "%" + s.toUpperCase() + "%");
+			i++;
+		}
+
+		if (s1 != null && !s1.isEmpty()) {
+			comando.setString(i, "%" + s.toUpperCase() + "%");
+			i++;
+		}
+
+		
+
+
+		ResultSet resultado = comando.executeQuery();
+
+		List<Cosmetico> ce = new ArrayList<>();
+
+		while (resultado.next()) {
+			Cosmetico c = new Cosmetico();
+			c.setNome(resultado.getString("nome"));
+			c.setTipo(resultado.getString("tipo"));
+			c.setValor(resultado.getDouble("valor"));
+
+			Marca m = new Marca();
+			m.setNome(resultado.getString("nomemarca"));
+			c.setMarca(m);
+
+			ce.add(c);
+
+		}
+		
+		return ce;
 	}
 }
-
-

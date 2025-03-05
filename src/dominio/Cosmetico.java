@@ -10,7 +10,16 @@ public class Cosmetico {
 	private String nome;
 	private String tipo;
 	private int idmarca;
+	private Marca marca;
 	
+	public Marca getMarca() {
+		return marca;
+	}
+
+	public void setMarca(Marca marca) {
+		this.marca = marca;
+	}
+
 	public Cosmetico() {
 		this.idmarca = 1;
 	}
