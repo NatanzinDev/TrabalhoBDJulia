@@ -14,10 +14,9 @@ import dominio.Cosmetico;
 import dominio.Marca;
 
 public class CosmeticoDao {
-	public void cadastrarComestico(String nome, String tipo, double valor) throws ClassNotFoundException, SQLException {
+	public void cadastrarComestico(String nome, String tipo, double valor, Marca m) throws ClassNotFoundException, SQLException {
 		Connection conexao = FabricaConexao.criarConexao();
 
-		int idmarca = verificarOuCriarMarcaGenerica();
 
 		String sql = "INSERT INTO cosmetico (nome, tipo, valor,idmarca) VALUES (?,?,?,?)";
 
@@ -25,7 +24,7 @@ public class CosmeticoDao {
 		c.setNome(nome);
 		c.setTipo(tipo);
 		c.setValor(valor);
-		c.setIdmarca(idmarca);
+		c.setIdmarca(m.getId());
 		System.out.println(c.getIdmarca());
 
 		PreparedStatement comando = conexao.prepareStatement(sql);
@@ -42,29 +41,7 @@ public class CosmeticoDao {
 		conexao.close();
 	}
 
-	private int verificarOuCriarMarcaGenerica() throws ClassNotFoundException, SQLException {
-		Connection conexao = FabricaConexao.criarConexao();
-		String sqlVerifica = "SELECT idmarca FROM marca WHERE idmarca = 1";
-		PreparedStatement comando = conexao.prepareStatement(sqlVerifica);
-		ResultSet resultado = comando.executeQuery();
-
-		if (resultado.next()) {
-			return resultado.getInt("idmarca");
-		}
-
-		String sqlInsere = "INSERT INTO marca(nome, seguemento) VALUES (?, ?)";
-		PreparedStatement comandoInsere = conexao.prepareStatement(sqlInsere, PreparedStatement.RETURN_GENERATED_KEYS);
-		comandoInsere.setString(1, "Generico");
-		comandoInsere.setString(2, "Generico");
-		comandoInsere.executeUpdate();
-
-		ResultSet chaves = comandoInsere.getGeneratedKeys();
-		if (chaves.next()) {
-			return chaves.getInt(1);
-		}
-
-		throw new SQLException("Falha ao criar marca genérica.");
-	}
+	
 
 	public void updateCosmetico(Cosmetico c) throws ClassNotFoundException, SQLException {
 

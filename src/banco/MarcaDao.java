@@ -13,6 +13,7 @@ import javax.swing.JOptionPane;
 import dominio.Marca;
 
 
+
 public class MarcaDao {
 	public void addMarca(Marca m) throws ClassNotFoundException, SQLException {
 		Connection conexao = FabricaConexao.criarConexao();
@@ -114,5 +115,41 @@ public class MarcaDao {
 		}
 
 		return mc;
+	}
+
+	public List<Marca> buscarMarcaPeloNome(String nome) throws ClassNotFoundException, SQLException {
+		
+		Connection conexao = FabricaConexao.criarConexao();
+
+		String sql = " SELECT * FROM marca WHERE 1 = 1 ";
+
+		if (nome != null && !nome.isEmpty()) {
+			sql += " AND upper(nome) LIKE ? ";
+
+		}
+
+		PreparedStatement comando = conexao.prepareStatement(sql.toString());
+
+		int i = 1;
+
+		if (nome != null && !nome.isEmpty()) {
+			comando.setString(i++, "%" + nome.toUpperCase() + "%");
+
+		}
+
+		ResultSet resultado = comando.executeQuery();
+
+		List<Marca> achado = new ArrayList<>();
+
+		while (resultado.next()) {
+			Marca m = new Marca();
+			m.setId(resultado.getInt("idmarca"));
+			m.setNome(resultado.getString("nome"));
+			m.setSegmento(resultado.getString("seguemento"));
+
+			achado.add(m);
+		}
+
+		return achado;
 	}
 }

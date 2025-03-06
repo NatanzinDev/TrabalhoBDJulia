@@ -6,11 +6,15 @@ import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -24,7 +28,13 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
 import banco.CosmeticoDao;
+import banco.MarcaDao;
+import ca.odell.glazedlists.BasicEventList;
+import ca.odell.glazedlists.SortedList;
+import ca.odell.glazedlists.swing.AutoCompleteSupport;
 import dominio.Cosmetico;
+import dominio.Marca;
+
 
 public class CadastraCosmetico extends JFrame {
 
@@ -35,6 +45,9 @@ public class CadastraCosmetico extends JFrame {
 	private JTextField txtValor;
 	private JButton btCadastrar;
 	private JList list;
+	private JComboBox comboBox;
+	private SortedList<Marca> setores = new SortedList<Marca>(new BasicEventList<Marca>());
+	
 
 	/**
 	 * Launch the application.
@@ -128,8 +141,18 @@ public class CadastraCosmetico extends JFrame {
 			}
 		});
 		btCadastrar.setFont(new Font("Tahoma", Font.PLAIN, 13));
-		btCadastrar.setBounds(125, 275, 161, 21);
+		btCadastrar.setBounds(124, 296, 161, 21);
 		panel.add(btCadastrar);
+		
+		JLabel lblNewLabel_1_1_1_1 = new JLabel("Marca:");
+		lblNewLabel_1_1_1_1.setForeground(Color.WHITE);
+		lblNewLabel_1_1_1_1.setFont(new Font("Tahoma", Font.BOLD, 15));
+		lblNewLabel_1_1_1_1.setBounds(26, 245, 69, 20);
+		panel.add(lblNewLabel_1_1_1_1);
+		
+		comboBox = new JComboBox();
+		comboBox.setBounds(104, 247, 201, 21);
+		panel.add(comboBox);
 
 		JPanel panel_1 = new JPanel();
 		panel_1.setBackground(new Color(0, 255, 64));
@@ -183,7 +206,44 @@ public class CadastraCosmetico extends JFrame {
 		btnNewButton_1_1_1.setBounds(295, 287, 109, 21);
 		panel_1.add(btnNewButton_1_1_1);
 		
+	AutoCompleteSupport.install(comboBox, setores);
+		
+		comboBox.getEditor().getEditorComponent().addKeyListener(new KeyAdapter() {
+
+			@Override
+			public void keyReleased(KeyEvent arg0) {
+				try {
+					buscarMarca();
+				} catch (ClassNotFoundException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		
 		atualizarLista();
+	}
+
+	protected void buscarMarca() throws ClassNotFoundException {
+		if (comboBox.getEditor().getItem() != null
+				&& comboBox.getEditor().getItem().toString().length() >= 3) {
+			MarcaDao dao = new MarcaDao();
+			List<Marca> marcaEncontrados = new ArrayList<>();
+
+			try {
+				String nome = comboBox.getEditor().getItem().toString();
+				marcaEncontrados = dao.buscarMarcaPeloNome(nome);
+
+				setores.clear();
+				setores.addAll(marcaEncontrados);
+
+				comboBox.showPopup();
+				
+			} catch (SQLException e) {
+				e.printStackTrace();
+				JOptionPane.showMessageDialog(null, "Erro no Sistema");
+			}
+		}
+		
 	}
 
 	protected void editar() {
@@ -228,11 +288,17 @@ public class CadastraCosmetico extends JFrame {
 			exibirMensagemErro("Curso não pode ser vazio");
 			return;
 		}
+		if(comboBox.getSelectedItem() == null || comboBox.getSelectedItem().toString().isEmpty()) {
+			exibirMensagemErro("Marca não pode estar vazia");
+			return;
+		}
+		
+		Marca m = (Marca) comboBox.getSelectedItem();
 		
 		if(btCadastrar.getText().equals("Cadastrar")) {
 			CosmeticoDao dao = new CosmeticoDao();
 			try {
-				dao.cadastrarComestico(txtNome.getText(), txtTipo.getText(), Double.parseDouble(txtValor.getText()));
+				dao.cadastrarComestico(txtNome.getText(), txtTipo.getText(), Double.parseDouble(txtValor.getText()),m);
 			}catch(Exception e) {
 				JOptionPane.showMessageDialog(null, "Erro ao tentar cadastrar cosmético, tente novamente.");
 				System.out.println(e.getMessage());
@@ -274,9 +340,10 @@ public class CadastraCosmetico extends JFrame {
 		list.setModel(modelo);
 		
 	}
+	
+	
 
 	private void exibirMensagemErro(String string) {
 		JOptionPane.showMessageDialog(contentPane, string);
 	}
-
 }

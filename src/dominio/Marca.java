@@ -3,7 +3,7 @@ package dominio;
 public class Marca {
 	@Override
 	public String toString() {
-		return nome +" Seguemento:"+seguemento;
+		return nome +" Seguemento:"+seguemento +"ID:"+id;
 	}
 	private int id;
 	private String nome;

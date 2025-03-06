@@ -5,6 +5,9 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
+
+
 import javax.swing.JLabel;
 import javax.swing.ImageIcon;
 import java.awt.Toolkit;
@@ -12,6 +15,7 @@ import javax.swing.JButton;
 import java.awt.Font;
 import java.awt.Color;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 import java.awt.event.ActionEvent;
 
 public class Principal extends JFrame {
@@ -52,6 +56,17 @@ public class Principal extends JFrame {
 		JButton btCadastrarCosmetico = new JButton("Cadastrar Cosmético");
 		btCadastrarCosmetico.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				CadastraCosmetico a = null;
+
+				try {
+					a = new CadastraCosmetico();
+				} catch (ClassNotFoundException | SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				a.setLocationRelativeTo(null);
+				a.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+				a.setVisible(true);
 				
 			}
 		});
@@ -62,6 +77,16 @@ public class Principal extends JFrame {
 		contentPane.add(btCadastrarCosmetico);
 		
 		JButton btCadastrarMarca = new JButton("Cadastrar Marcar");
+		btCadastrarMarca.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				CadastrarMarca a = null;
+
+				a = new CadastrarMarca();
+				a.setLocationRelativeTo(null);
+				a.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+				a.setVisible(true);
+			}
+		});
 		btCadastrarMarca.setForeground(new Color(0, 255, 64));
 		btCadastrarMarca.setBackground(new Color(255, 255, 255));
 		btCadastrarMarca.setFont(new Font("Tahoma", Font.PLAIN, 14));
@@ -69,6 +94,16 @@ public class Principal extends JFrame {
 		contentPane.add(btCadastrarMarca);
 		
 		JButton btBuscarCosmetico = new JButton("BuscarCosmetico");
+		btBuscarCosmetico.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				BuscarCosmetico a = null;
+
+				a = new BuscarCosmetico();
+				a.setLocationRelativeTo(null);
+				a.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+				a.setVisible(true);
+			}
+		});
 		btBuscarCosmetico.setForeground(new Color(0, 255, 64));
 		btBuscarCosmetico.setBackground(new Color(255, 255, 255));
 		btBuscarCosmetico.setFont(new Font("Tahoma", Font.PLAIN, 14));
@@ -76,6 +111,16 @@ public class Principal extends JFrame {
 		contentPane.add(btBuscarCosmetico);
 		
 		JButton btBuscarMarca = new JButton("BuscarMarca");
+		btBuscarMarca.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				BuscarMarca a = null;
+
+				a = new BuscarMarca();
+				a.setLocationRelativeTo(null);
+				a.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+				a.setVisible(true);
+			}
+		});
 		btBuscarMarca.setForeground(new Color(0, 255, 64));
 		btBuscarMarca.setBackground(new Color(255, 255, 255));
 		btBuscarMarca.setFont(new Font("Tahoma", Font.PLAIN, 14));
